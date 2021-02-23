@@ -36,7 +36,7 @@ public class User {
     private String phone;
 
     @Column(name="role")
-    private Long role;
+    private String role;
 
     @Column(name="active")
     private Boolean active;
