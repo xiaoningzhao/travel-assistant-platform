@@ -8,6 +8,7 @@ import edu.sjsu.cmpe295.userservice.repositories.FavoritePlaceRepository;
 import edu.sjsu.cmpe295.userservice.repositories.FriendRepository;
 import edu.sjsu.cmpe295.userservice.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,6 +20,8 @@ public class UserServiceImpl implements UserService{
     private final UserRepository userRepository;
     private final FriendRepository friendRepository;
     private final FavoritePlaceRepository favoritePlaceRepository;
+
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Override
     public User getUserByEmail(String email) {
@@ -38,7 +41,7 @@ public class UserServiceImpl implements UserService{
         if (!userRepository.existsByEmail(user.getEmail())) {
             user.setActive(false);
             user.setRole("ROLE_USER");
-//            user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+            user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
             String token = UUID.randomUUID().toString().replace("-", "");
             user.setToken(token);
             userRepository.save(user);
