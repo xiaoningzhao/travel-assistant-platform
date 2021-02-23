@@ -23,6 +23,7 @@
         <module>config-service</module>
         <module>sample-service-provider</module>
         <module>sample-service-client</module>
+        <module>user-service</module>
     </modules>
     <dependencies>
         <dependency>
