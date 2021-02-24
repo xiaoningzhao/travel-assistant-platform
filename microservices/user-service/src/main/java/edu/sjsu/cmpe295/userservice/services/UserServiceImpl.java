@@ -1,6 +1,7 @@
 package edu.sjsu.cmpe295.userservice.services;
 
 import edu.sjsu.cmpe295.userservice.exceptions.ConflictException;
+import edu.sjsu.cmpe295.userservice.exceptions.NotFoundException;
 import edu.sjsu.cmpe295.userservice.models.FavoritePlace;
 import edu.sjsu.cmpe295.userservice.models.Friend;
 import edu.sjsu.cmpe295.userservice.models.User;
@@ -25,15 +26,20 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public User getUserByEmail(String email) {
-        return userRepository.findByEmail(email);
+        if (userRepository.existsByEmail(email)) {
+            return userRepository.findByEmail(email);
+        }else{
+            throw new NotFoundException("User does not exist.");
+        }
     }
 
     @Override
     public User getUserById(Long id) {
         if (userRepository.findById(id).isPresent()){
             return userRepository.findById(id).get();
+        }else{
+            throw new NotFoundException("User does not exist.");
         }
-        return null;
     }
 
     @Override
@@ -53,11 +59,19 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public List<Friend> getFriends(Long userId) {
-        return friendRepository.findAllByUser1Id(userId);
+        if(userRepository.existsById(userId)) {
+            return friendRepository.findAllByUser1Id(userId);
+        }else{
+            throw new NotFoundException("User does not exist.");
+        }
     }
 
     @Override
     public List<FavoritePlace> getFavoritePlaces(Long userId) {
-        return favoritePlaceRepository.findAllByUserId(userId);
+        if(userRepository.existsById(userId)) {
+            return favoritePlaceRepository.findAllByUserId(userId);
+        }else{
+            throw new NotFoundException("User does not exist.");
+        }
     }
 }
