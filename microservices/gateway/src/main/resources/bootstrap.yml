@@ -1,0 +1,58 @@
+#spring:
+#  application:
+#    name: gateway
+#  cloud:
+#    config:
+#      uri: http://localhost:8888
+
+spring:
+  application:
+    name: gateway
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      routes:
+        - id: user-service-route
+          uri: lb://user-service
+          predicates:
+            - Path=/user/**
+          filters:
+            - StripPrefix=1
+        - id: auth-service-oauth2-route
+          uri: lb://auth-service-oauth2
+          predicates:
+            - Path=/auth/**, /key/rsa/**
+          filters:
+            - StripPrefix=1
+        - id: login-route
+          uri: lb://auth-service-oauth2
+          predicates:
+            - Path=/login/**
+          filters:
+            - StripPrefix=1
+            - SetPath=/oauth/token
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: 'http://127.0.0.1:${server.port}/key/rsa/publicKey'
+
+secure:
+  allow:
+    urls:
+      - "/actuator/**"
+      - "/login"
+      - "/auth/oauth/token"
+      - "/key/rsa/publicKey"
+
+server:
+  port: 8080
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
