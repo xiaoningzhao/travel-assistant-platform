@@ -6,12 +6,12 @@
         <groupId>edu.sjsu.cmpe295</groupId>
         <artifactId>tap</artifactId>
         <version>0.0.1-SNAPSHOT</version>
-        <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <artifactId>gateway</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>gateway</name>
     <description>Gateway</description>
+    <packaging>jar</packaging>
     <properties>
         <java.version>1.8</java.version>
         <spring-cloud.version>2020.0.1</spring-cloud.version>
