@@ -1,2 +1,2 @@
 # User Service
-API doc at [User Service API](https://htmlpreview.github.io/?https://github.com/xiaoningzhao/travel-assistant-platform/blob/main/documents/API/user-service-api.html)
+API doc at [User Service API](https://xiaoningzhao.github.io/travel-assistant-platform/api/user-service-api.html)
