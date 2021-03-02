@@ -15,8 +15,6 @@ public class Friend {
     @Id
     private Long user2Id;
 
-//    @ManyToOne(cascade = CascadeType.ALL)
-//    @JoinColumn(name = "user1_id", insertable = false, updatable = false)
-//    private User userFriend;
-
+    @Column(name = "status")
+    private String status;
 }

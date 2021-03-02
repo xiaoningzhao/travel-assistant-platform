@@ -13,10 +13,6 @@ public class FavoritePlace {
     private Long userId;
 
     @Id
-    private Long placeId;
-//
-//    @ManyToOne(cascade = CascadeType.ALL)
-//    @JoinColumn(name = "user_id", insertable = false, updatable = false)
-//    private User user;
+    private String placeId;
 
 }

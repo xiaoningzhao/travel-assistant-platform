@@ -11,5 +11,5 @@ public class FavoritePlaceId implements Serializable {
     private Long userId;
 
     @Column(name = "place_id")
-    private Long placeId;
+    private String placeId;
 }

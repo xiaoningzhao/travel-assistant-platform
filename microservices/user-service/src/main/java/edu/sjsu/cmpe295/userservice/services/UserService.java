@@ -10,6 +10,11 @@ public interface UserService {
     User getUserByEmail(String email);
     User getUserById(Long id);
     User register(User user);
-    List<Friend> getFriends(Long userId);
-    List<FavoritePlace> getFavoritePlaces(Long userId);
+    User modifyUserProfile(User user);
+    List<String> getFriends(Long userId);
+    Friend addNewFriend(Long user1Id, Long user2Id);
+    Friend deleteFriend(Long user1Id, Long user2Id);
+    List<String> getFavoritePlaces(Long userId);
+    FavoritePlace addFavoritePlace(Long userId, String placeId);
+    FavoritePlace deleteFavoritePlace(Long userId, String placeId);
 }

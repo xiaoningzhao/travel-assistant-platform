@@ -1,12 +1,15 @@
 package edu.sjsu.cmpe295.userservice.exceptions;
 
 import edu.sjsu.cmpe295.userservice.models.ResponseMessage;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import javax.validation.ConstraintViolationException;
 import java.time.LocalDateTime;
 
 @ControllerAdvice
@@ -28,5 +31,11 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ResponseMessage handleNotFoundException(Exception e){
         return new ResponseMessage(LocalDateTime.now().toString(), HttpStatus.NOT_FOUND.value(), e.getClass().getSimpleName(), e.getMessage());
+    }
+
+    @ExceptionHandler({MethodArgumentNotValidException.class, ConstraintViolationException.class, InvalidDataAccessApiUsageException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseMessage handleMethodArgumentNotValidException(Exception e){
+        return new ResponseMessage(LocalDateTime.now().toString(), HttpStatus.BAD_REQUEST.value(), e.getClass().getSimpleName(), e.getMessage());
     }
 }
