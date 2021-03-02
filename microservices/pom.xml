@@ -23,6 +23,7 @@
         <module>config-service</module>
         <module>gateway</module>
         <module>user-service</module>
+        <module>notification-service</module>
     </modules>
     <dependencies>
         <dependency>
