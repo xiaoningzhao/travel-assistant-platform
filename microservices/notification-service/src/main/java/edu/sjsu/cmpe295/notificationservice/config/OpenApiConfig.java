@@ -15,6 +15,6 @@ public class OpenApiConfig {
         return new OpenAPI()
                 .components(new Components())
                 .info(new Info().title("Notification Service API").version("0.1").description(
-                        "This is a notification service.").contact(new Contact().name("Xiaoning").email("xiaoning.zhao@sjsu.edu.com")));
+                        "This is a notification service.").contact(new Contact().name("Xiaoning").email("xiaoning.zhao@sjsu.edu")));
     }
 }
