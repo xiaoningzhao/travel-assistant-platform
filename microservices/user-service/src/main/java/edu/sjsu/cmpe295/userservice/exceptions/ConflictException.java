@@ -1,0 +1,7 @@
+package edu.sjsu.cmpe295.userservice.exceptions;
+
+public class ConflictException extends RuntimeException{
+    public ConflictException(String message) {
+        super(message);
+    }
+}
