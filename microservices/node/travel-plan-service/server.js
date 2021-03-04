@@ -5,6 +5,10 @@ const colors = require('colors');
 const connectDB = require('./config/db');
 const cors = require('cors');
 const path = require('path');
+const travelplan = require('./routes/travelplanRoute');
+const errorHandler = require('./middleware/error');
+const fileupload = require('express-fileupload');
+
 
 // Load env variables
 dotenv.config({ path: `./config/config.env` });
@@ -17,21 +21,27 @@ const app = express();
 //Body parser
 app.use(express.json());
 
-app.get('/', (req, res) => {
-    res.send('Hello from express');
-});
 
 //Development env logging middleware
 if (process.env.NODE_ENV === 'development') {
     app.use(morgan('dev'));
 }
 
+//File uploading
+app.use(fileupload());
 
 //Enable Cors
 app.use(cors());
 
 //Set static folder
 app.use(express.static(path.join(__dirname, 'public')));
+
+
+//API route
+app.use('/v1/travelplan', travelplan);
+
+//Handle error response
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 5001;
 const server = app.listen(
