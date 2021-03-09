@@ -1,6 +1,8 @@
 package com.travelassistantplatform.travelreview.service.impl;
 
 import com.travelassistantplatform.travelreview.enums.ResultEnum;
+import com.travelassistantplatform.travelreview.exception.NotFoundException;
+import com.travelassistantplatform.travelreview.exception.PersistenceFailureException;
 import com.travelassistantplatform.travelreview.exception.TravelReviewException;
 import com.travelassistantplatform.travelreview.model.UserTripHistory;
 import com.travelassistantplatform.travelreview.repository.UserTripHistoryRepository;
@@ -23,7 +25,7 @@ public class UserTripHistoryServiceImpl implements UserTripHistoryService {
     public UserTripHistory save(UserTripHistory userTripHistory) {
         UserTripHistory savedUserTripHistory = userTripHistoryRepository.save(userTripHistory);
         if (savedUserTripHistory == null) {
-            throw new TravelReviewException(ResultEnum.USER_TRIP_HISTORY_SAVING_FAILED);
+            throw new PersistenceFailureException(ResultEnum.USER_TRIP_HISTORY_SAVING_FAILED);
         }
         return savedUserTripHistory;
     }
@@ -38,7 +40,7 @@ public class UserTripHistoryServiceImpl implements UserTripHistoryService {
         List<UserTripHistory> tripHistoryListList = userTripHistoryRepository.findUserTripHistoriesByUserId(userId);
         if (tripHistoryListList == null || tripHistoryListList.size() == 0){
             log.error("[UserTripHistoryServiceImpl::findOneByUserId] Trip details not found. tripId:{}", userId);
-            throw new TravelReviewException(ResultEnum.USER_HAS_NO_TRIP_HISTORY);
+            throw new NotFoundException(ResultEnum.USER_HAS_NO_TRIP_HISTORY);
         }
 
         UserTripIdObject userTripIdObject = new UserTripIdObject();

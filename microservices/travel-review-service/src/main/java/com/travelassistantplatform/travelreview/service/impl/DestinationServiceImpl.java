@@ -1,6 +1,8 @@
 package com.travelassistantplatform.travelreview.service.impl;
 
 import com.travelassistantplatform.travelreview.enums.ResultEnum;
+import com.travelassistantplatform.travelreview.exception.NotFoundException;
+import com.travelassistantplatform.travelreview.exception.PersistenceFailureException;
 import com.travelassistantplatform.travelreview.exception.TravelReviewException;
 import com.travelassistantplatform.travelreview.model.Destination;
 import com.travelassistantplatform.travelreview.repository.DestinationRepository;
@@ -22,7 +24,7 @@ public class DestinationServiceImpl implements DestinationService {
     public Destination save(Destination destination) {
         Destination savedDestination = destinationRepository.save(destination);
         if(savedDestination == null){
-            throw new TravelReviewException(ResultEnum.DESTINATION_SAVING_FAILED);
+            throw new PersistenceFailureException(ResultEnum.DESTINATION_SAVING_FAILED);
         }
         return savedDestination;
     }
@@ -32,7 +34,7 @@ public class DestinationServiceImpl implements DestinationService {
         Optional<Destination> destinationOptional = destinationRepository.findById(destinationId);
         if (! destinationOptional.isPresent()){
             log.error("[DestinationServiceImpl::findOneByDestinationId] Destination not found. destinationId:{}", destinationId);
-            throw new TravelReviewException(ResultEnum.DESTINATION_NOT_FOUND);
+            throw new NotFoundException(ResultEnum.DESTINATION_NOT_FOUND);
         }
         return destinationOptional.get();
     }

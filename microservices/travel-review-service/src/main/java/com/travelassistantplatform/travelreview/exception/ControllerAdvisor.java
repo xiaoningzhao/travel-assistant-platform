@@ -12,7 +12,7 @@ import java.util.Map;
 
 @ControllerAdvice
 public class ControllerAdvisor {
-    @ExceptionHandler(TravelReviewException.class)
+    @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<Object> handleNotFound(TravelReviewException travelReviewException, WebRequest webRequest){
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", LocalDateTime.now());
@@ -20,5 +20,15 @@ public class ControllerAdvisor {
         body.put("internal error code", travelReviewException.getCode());
 
         return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(PersistenceFailureException.class)
+    public ResponseEntity<Object> handlePersistenceFailure(TravelReviewException travelReviewException, WebRequest webRequest){
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("message", travelReviewException.getMessage());
+        body.put("internal error code", travelReviewException.getCode());
+
+        return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

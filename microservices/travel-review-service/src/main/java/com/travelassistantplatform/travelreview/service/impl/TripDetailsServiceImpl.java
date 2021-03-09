@@ -1,6 +1,8 @@
 package com.travelassistantplatform.travelreview.service.impl;
 
 import com.travelassistantplatform.travelreview.enums.ResultEnum;
+import com.travelassistantplatform.travelreview.exception.NotFoundException;
+import com.travelassistantplatform.travelreview.exception.PersistenceFailureException;
 import com.travelassistantplatform.travelreview.exception.TravelReviewException;
 import com.travelassistantplatform.travelreview.model.TripDetails;
 import com.travelassistantplatform.travelreview.repository.TripDetailsRepository;
@@ -22,7 +24,7 @@ public class TripDetailsServiceImpl implements TripDetailsService {
     public TripDetails save(TripDetails tripDetails) {
         TripDetails savedTripDetails = tripDetailsRepository.save(tripDetails);
         if (savedTripDetails == null){
-            throw new TravelReviewException(ResultEnum.TRIP_SAVING_FAILED);
+            throw new PersistenceFailureException(ResultEnum.TRIP_SAVING_FAILED);
         }
         return savedTripDetails;
     }
@@ -37,7 +39,7 @@ public class TripDetailsServiceImpl implements TripDetailsService {
         Optional<TripDetails> tripDetailsOptional = tripDetailsRepository.findById(tripId);
         if (! tripDetailsOptional.isPresent()){
             log.error("[TripDetailsServiceImpl::findOneByTripId] Trip details not found. tripId:{}", tripId);
-            throw new TravelReviewException(ResultEnum.TRIP_NOT_FOUND);
+            throw new NotFoundException(ResultEnum.TRIP_NOT_FOUND);
         }
         return tripDetailsOptional.get();
     }
