@@ -1,0 +1,35 @@
+#spring:
+#  application:
+#    name: user-service
+#  cloud:
+#    config:
+#      uri: http://localhost:8888
+
+spring:
+  application:
+    name: notification-service
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:notification
+    username: xiaoning
+    password: password
+  jpa:
+    database: h2
+    hibernate:
+      ddl-auto: update
+  h2:
+    console:
+      enabled: true
+      settings:
+        web-allow-others: true
+
+server:
+  port: 7007
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+
+
+

@@ -1,0 +1,17 @@
+node_modules/
+_data/
+.DS_Store
+config/config.env
+models/User.js
+seeder.js
+axiso.js
+travelplanRoute.js
+models/Address.js
+models/Comment.js
+models/User.js
+models/Travelplan.js
+controllers/addressController.js 
+controllers/commentController.js
+controllers/travelplanController.js
+controllers/userController.js
+

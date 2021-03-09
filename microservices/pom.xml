@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.4.2</version>
+        <version>2.4.3</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>edu.sjsu.cmpe295</groupId>
@@ -21,8 +21,9 @@
     <modules>
         <module>registry-service</module>
         <module>config-service</module>
-        <module>sample-service-provider</module>
-        <module>sample-service-client</module>
+        <module>gateway</module>
+        <module>user-service</module>
+        <module>notification-service</module>
     </modules>
     <dependencies>
         <dependency>
