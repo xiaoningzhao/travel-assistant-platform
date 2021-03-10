@@ -46,7 +46,7 @@ public class UserServiceImpl implements UserService{
     @Override
     public User register(User user) {
         if (!userRepository.existsByEmail(user.getEmail())) {
-            user.setActive(false);
+            user.setActive(true);
             user.setRole("ROLE_USER");
             user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
             String token = UUID.randomUUID().toString().replace("-", "");
