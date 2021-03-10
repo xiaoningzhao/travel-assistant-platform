@@ -33,6 +33,9 @@ public class Notification {
     @Size(max = 5000)
     private String content;
 
+    @Schema(description = "Identify if a notification has been read", example = "true")
+    private boolean isRead;
+
     @Schema(description = "Notification send timestamp", example = "2021-03-01T21:11:28.188")
     private String timestamp;
 

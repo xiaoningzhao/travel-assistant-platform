@@ -34,12 +34,14 @@ public class NotificationServiceImpl implements NotificationService{
         if(this.connectedUsers.containsValue(userId)) {
             notification.setToUserId(userId);
             notification.setTimestamp(LocalDateTime.now().toString());
+            notification.setRead(false);
             notification.setReceived(true);
             notificationRepository.save(notification);
             simpMessagingTemplate.convertAndSendToUser(userId, WS_MESSAGE_TRANSFER_INDIVIDUAL_DESTINATION, notification);
         }else{
             notification.setToUserId(userId);
             notification.setTimestamp(LocalDateTime.now().toString());
+            notification.setRead(false);
             notification.setReceived(false);
             notificationRepository.save(notification);
         }
@@ -89,5 +91,16 @@ public class NotificationServiceImpl implements NotificationService{
     @Override
     public void removeConnectedUser(String sessionId){
         this.connectedUsers.remove(sessionId);
+    }
+
+    @Override
+    public void setNotificationAsRead(Long id) {
+        if(notificationRepository.existsById(id)){
+            Notification notification = notificationRepository.findById(id).get();
+            notification.setRead(true);
+            notificationRepository.save(notification);
+        }else {
+            throw new NotFoundException("No such notification");
+        }
     }
 }

@@ -15,4 +15,5 @@ public interface NotificationService {
     HashMap<String, String> getConnectedUsers();
     void addConnectedUser(String userId, String sessionId);
     void removeConnectedUser(String userId);
+    void setNotificationAsRead(Long id);
 }
