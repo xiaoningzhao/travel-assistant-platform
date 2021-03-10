@@ -2,10 +2,7 @@ package edu.sjsu.cmpe295.userservice.services;
 
 import edu.sjsu.cmpe295.userservice.exceptions.ConflictException;
 import edu.sjsu.cmpe295.userservice.exceptions.NotFoundException;
-import edu.sjsu.cmpe295.userservice.models.FavoritePlace;
-import edu.sjsu.cmpe295.userservice.models.Friend;
-import edu.sjsu.cmpe295.userservice.models.FriendId;
-import edu.sjsu.cmpe295.userservice.models.User;
+import edu.sjsu.cmpe295.userservice.models.*;
 import edu.sjsu.cmpe295.userservice.repositories.FavoritePlaceRepository;
 import edu.sjsu.cmpe295.userservice.repositories.FriendRepository;
 import edu.sjsu.cmpe295.userservice.repositories.UserRepository;
@@ -13,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -80,17 +78,29 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public List<String> getFriends(Long userId) {
+    public List<UserBasicInfo> getFriends(Long userId) {
         if(userRepository.existsById(userId)) {
-            return friendRepository.findFriendsListByUser1Id(userId);
+            List<Long> friendIds = friendRepository.findFriendsListByUser1Id(userId);
+            List<UserBasicInfo> friends = new ArrayList<>();
+            for(Long friendId : friendIds){
+                UserBasicInfo userBasicInfo = new UserBasicInfo();
+                User user = userRepository.findById(friendId).get();
+                userBasicInfo.setId(friendId);
+                userBasicInfo.setEmail(user.getEmail());
+                userBasicInfo.setFirstName(user.getFirstName());
+                userBasicInfo.setLastName(user.getLastName());
+                friends.add(userBasicInfo);
+            }
+            return friends;
         }else{
             throw new NotFoundException("User does not exist.");
         }
     }
 
     @Override
-    public Friend addNewFriend(Long user1Id, Long user2Id) {
-        if(userRepository.existsById(user1Id) && userRepository.existsById(user2Id)){
+    public Friend addNewFriend(Long user1Id, String user2email) {
+        if(userRepository.existsById(user1Id) && userRepository.existsByEmail(user2email)){
+            Long user2Id = userRepository.findByEmail(user2email).getId();
             FriendId friendId = new FriendId();
             friendId.setUser1Id(user1Id);
             friendId.setUser2Id(user2Id);
@@ -108,8 +118,9 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public Friend deleteFriend(Long user1Id, Long user2Id) {
-        if(userRepository.existsById(user1Id) && userRepository.existsById(user2Id)){
+    public Friend deleteFriend(Long user1Id, String user2email) {
+        if(userRepository.existsById(user1Id) && userRepository.existsByEmail(user2email)){
+            Long user2Id = userRepository.findByEmail(user2email).getId();
             FriendId friendId = new FriendId();
             friendId.setUser1Id(user1Id);
             friendId.setUser2Id(user2Id);

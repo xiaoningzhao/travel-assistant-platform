@@ -3,6 +3,7 @@ package edu.sjsu.cmpe295.userservice.controllers;
 import edu.sjsu.cmpe295.userservice.models.FavoritePlace;
 import edu.sjsu.cmpe295.userservice.models.Friend;
 import edu.sjsu.cmpe295.userservice.models.User;
+import edu.sjsu.cmpe295.userservice.models.UserBasicInfo;
 import edu.sjsu.cmpe295.userservice.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -48,20 +49,20 @@ public class UserController {
 
     @Operation(summary = "Retrieve user's friends' ID", description = "Retrieve user's friends' ID", tags = { "User Service" })
     @GetMapping("/friends/{userId}")
-    public List<String> getFriend(@PathVariable Long userId) {
+    public List<UserBasicInfo> getFriend(@PathVariable Long userId) {
         return userService.getFriends(userId);
     }
 
     @Operation(summary = "Add a friend", description = "Create a new friendship relation between user1 and user2", tags = { "User Service" })
-    @PostMapping("/friends/{user1Id}/{user2Id}")
-    public Friend addNewFriend(@PathVariable Long user1Id, @PathVariable Long user2Id){
-        return userService.addNewFriend(user1Id, user2Id);
+    @PostMapping("/friends/{user1Id}/{user2email}")
+    public Friend addNewFriend(@PathVariable Long user1Id, @PathVariable String user2email){
+        return userService.addNewFriend(user1Id, user2email);
     }
 
     @Operation(summary = "Delete a friend", description = "Delete a friendship relation between user1 and user2", tags = { "User Service" })
-    @DeleteMapping("/friends/{user1Id}/{user2Id}")
-    public Friend deleteFriend(@PathVariable Long user1Id, @PathVariable Long user2Id){
-        return userService.deleteFriend(user1Id, user2Id);
+    @DeleteMapping("/friends/{user1Id}/{user2email}")
+    public Friend deleteFriend(@PathVariable Long user1Id, @PathVariable String user2email){
+        return userService.deleteFriend(user1Id, user2email);
     }
 
     @Operation(summary = "Retrieve user's favorite places", description = "Retrieve user's favorite places", tags = { "User Service" })
