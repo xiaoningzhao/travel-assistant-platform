@@ -1,5 +1,6 @@
 package edu.sjsu.cmpe295.userservice.controllers;
 
+import edu.sjsu.cmpe295.userservice.exceptions.ConflictException;
 import edu.sjsu.cmpe295.userservice.models.Comment;
 import edu.sjsu.cmpe295.userservice.models.Likes;
 import edu.sjsu.cmpe295.userservice.models.Post;
@@ -9,6 +10,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -90,6 +92,15 @@ public class BlogController {
     @DeleteMapping("/likes")
     public void deleteLIkes(@Valid @RequestBody Likes likes) {
         blogService.deleteLikes(likes);
+    }
+
+    @PostMapping("/image/{userId}/{postId}")
+    public void uploadPostImage(@RequestParam("image") MultipartFile multipartFile, @PathVariable Long postId, @PathVariable Long userId){
+        if (multipartFile.isEmpty()) {
+            throw new ConflictException("Image file is empty");
+        }
+        String imageUrl = blogService.uploadPostImage(multipartFile, postId, userId);
+        blogService.addPostImage(postId, imageUrl);
     }
 
 }

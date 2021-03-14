@@ -1,15 +1,18 @@
 package edu.sjsu.cmpe295.userservice.services;
 
+import edu.sjsu.cmpe295.userservice.exceptions.FileException;
 import edu.sjsu.cmpe295.userservice.exceptions.NotFoundException;
-import edu.sjsu.cmpe295.userservice.models.Comment;
-import edu.sjsu.cmpe295.userservice.models.Likes;
-import edu.sjsu.cmpe295.userservice.models.Post;
-import edu.sjsu.cmpe295.userservice.models.Tag;
+import edu.sjsu.cmpe295.userservice.models.*;
 import edu.sjsu.cmpe295.userservice.repositories.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
@@ -19,6 +22,13 @@ public class BlogServiceImpl implements BlogService{
     private final CommentRepository commentRepository;
     private final TagRepository tagRepository;
     private final LikesRepository likesRepository;
+    private final PostImageRepository postImageRepository;
+
+    @Value("${image.upload.path}")
+    private String imageUploadPath;
+
+    @Value("${image.static.path}")
+    private String staticPath;
 
     public enum Status{
         ACTIVE("active"), DELETE("delete");
@@ -140,6 +150,41 @@ public class BlogServiceImpl implements BlogService{
     public Integer getLikesCount(Long postId) {
         if(postRepository.findById(postId).isPresent()){
             return likesRepository.countAllByPostId(postId);
+        }else{
+            throw new NotFoundException("Post not found");
+        }
+    }
+
+    @Override
+    public String uploadPostImage(MultipartFile multipartFile, Long postId, Long userId) {
+        String fileName = multipartFile.getOriginalFilename();
+        String suffixName = fileName != null ? fileName.substring(fileName.lastIndexOf(".")) : null;
+        String filePath = imageUploadPath +"/"+userId+"/"+postId+"/";
+
+        fileName = UUID.randomUUID() + suffixName;
+        File file = new File(filePath + fileName);
+        if (!file.exists()) {
+            file.mkdirs();
+        }
+        try {
+            multipartFile.transferTo(file);
+            //return file path
+            return staticPath + userId + "/" + postId + "/" + fileName;
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new FileException("File cannot save");
+        }
+    }
+
+    @Override
+    public void addPostImage(Long postId, String imageUrl) {
+        if(postRepository.findById(postId).isPresent()){
+            PostImage postImage = new PostImage();
+            postImage.setPostId(postId);
+            postImage.setImageUrl(imageUrl);
+            postImageRepository.save(postImage);
+
         }else{
             throw new NotFoundException("Post not found");
         }

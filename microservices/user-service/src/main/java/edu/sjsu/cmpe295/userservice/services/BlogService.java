@@ -4,6 +4,7 @@ import edu.sjsu.cmpe295.userservice.models.Comment;
 import edu.sjsu.cmpe295.userservice.models.Likes;
 import edu.sjsu.cmpe295.userservice.models.Post;
 import edu.sjsu.cmpe295.userservice.models.Tag;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -23,4 +24,7 @@ public interface BlogService {
     Likes addLikes(Likes likes);
     void deleteLikes(Likes likes);
     Integer getLikesCount(Long postId);
+
+    String uploadPostImage(MultipartFile multipartFile, Long postId, Long userId);
+    void addPostImage(Long postId, String imageUrl);
 }
