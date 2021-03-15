@@ -42,6 +42,22 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
+    public UserBasicInfo getUserBasicProfile(Long userId) {
+        if (userRepository.findById(userId).isPresent()){
+            User user = userRepository.findById(userId).get();
+            UserBasicInfo userBasicInfo = new UserBasicInfo();
+            userBasicInfo.setId(user.getId());
+            userBasicInfo.setEmail(user.getEmail());
+            userBasicInfo.setFirstName(user.getFirstName());
+            userBasicInfo.setLastName(user.getLastName());
+
+            return userBasicInfo;
+        }else{
+            throw new NotFoundException("User does not exist.");
+        }
+    }
+
+    @Override
     public User register(User user) {
         if (!userRepository.existsByEmail(user.getEmail())) {
             user.setActive(true);

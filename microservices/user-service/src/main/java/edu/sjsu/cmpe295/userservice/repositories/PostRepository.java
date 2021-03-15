@@ -6,5 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
-    List<Post> findAllByAuthorId(Long authorId);
+    List<Post> findAllByAuthorIdAndStatusOrderByCreationTimeDesc(Long authorId, String status);
+    List<Post> findAllByAuthorIdInAndPrivacyInAndStatusOrderByCreationTimeDesc(List<Long> authorIds, List<String> privacy, String status);
 }

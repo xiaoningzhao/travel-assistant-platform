@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -23,6 +24,7 @@ public class BlogServiceImpl implements BlogService{
     private final TagRepository tagRepository;
     private final LikesRepository likesRepository;
     private final PostImageRepository postImageRepository;
+    private final FriendRepository friendRepository;
 
     @Value("${image.upload.path}")
     private String imageUploadPath;
@@ -32,8 +34,19 @@ public class BlogServiceImpl implements BlogService{
 
     public enum Status{
         ACTIVE("active"), DELETE("delete");
-        private String name;
+        private final String name;
         Status(String name){
+            this.name = name;
+        }
+        public String getName(){
+            return this.name;
+        }
+    }
+
+    public enum Privacy{
+        PUBLIC("public"), FRIENDS("friends"), PRIVATE("private");
+        private final String name;
+        Privacy(String name){
             this.name = name;
         }
         public String getName(){
@@ -43,7 +56,29 @@ public class BlogServiceImpl implements BlogService{
 
     @Override
     public List<Post> getPosts(Long userId) {
-        return postRepository.findAllByAuthorId(userId);
+        return postRepository.findAllByAuthorIdAndStatusOrderByCreationTimeDesc(userId, Status.ACTIVE.getName());
+    }
+
+    @Override
+    public List<Post> getFriendsPosts(Long userId) {
+        if(userRepository.findById(userId).isPresent()){
+            List<Long> friends = friendRepository.findFriendsListByUser1Id(userId);
+            List<String> privacy = new ArrayList<>();
+            privacy.add(Privacy.PUBLIC.getName());
+            privacy.add(Privacy.FRIENDS.getName());
+            return postRepository.findAllByAuthorIdInAndPrivacyInAndStatusOrderByCreationTimeDesc(friends, privacy, Status.ACTIVE.getName());
+        }else{
+            throw new NotFoundException("User not found");
+        }
+    }
+
+    @Override
+    public Post getPostById(Long postId) {
+        if(postRepository.findById(postId).isPresent()){
+            return postRepository.findById(postId).get();
+        }else{
+            throw new NotFoundException("Post not found");
+        }
     }
 
     @Override
@@ -70,7 +105,16 @@ public class BlogServiceImpl implements BlogService{
 
     @Override
     public List<Comment> getComments(Long postId) {
-        return commentRepository.findAllByPostId(postId);
+        return commentRepository.findAllByPostIdAndStatusOrderByCreationTimeDesc(postId, Status.ACTIVE.getName());
+    }
+
+    @Override
+    public Integer getCommentCount(Long postId) {
+        if(postRepository.findById(postId).isPresent()){
+            return commentRepository.countAllByPostIdAndStatus(postId, Status.ACTIVE.getName());
+        }else{
+            throw new NotFoundException("Post not found");
+        }
     }
 
     @Override
@@ -156,6 +200,20 @@ public class BlogServiceImpl implements BlogService{
     }
 
     @Override
+    public Boolean getIfLikes(Long userId, Long postId) {
+        if(userRepository.findById(userId).isPresent()){
+            if(postRepository.findById(postId).isPresent()){
+                return likesRepository.findByUserIdAndPostId(userId, postId) != null;
+
+            }else{
+                throw new NotFoundException("Post not found");
+            }
+        }else {
+            throw new NotFoundException("User not found");
+        }
+    }
+
+    @Override
     public String uploadPostImage(MultipartFile multipartFile, Long postId, Long userId) {
         String fileName = multipartFile.getOriginalFilename();
         String suffixName = fileName != null ? fileName.substring(fileName.lastIndexOf(".")) : null;
@@ -184,6 +242,16 @@ public class BlogServiceImpl implements BlogService{
             postImage.setPostId(postId);
             postImage.setImageUrl(imageUrl);
             postImageRepository.save(postImage);
+
+        }else{
+            throw new NotFoundException("Post not found");
+        }
+    }
+
+    @Override
+    public List<PostImage> getImagesUrl(Long postId) {
+        if(postRepository.findById(postId).isPresent()){
+            return postImageRepository.findAllByPostId(postId);
 
         }else{
             throw new NotFoundException("Post not found");

@@ -33,6 +33,13 @@ public class UserController {
         return userService.getUserByEmail(email);
     }
 
+    @Operation(summary = "Retrieve user basic information by user ID", description = "Retrieve user basic information by user ID", tags = { "User Service" })
+    @GetMapping("/profile/basic/{userId}")
+    public UserBasicInfo getUserBasicProfile(@Parameter(description = "User ID")
+                               @PathVariable @NotNull Long userId) {
+        return userService.getUserBasicProfile(userId);
+    }
+
     @Operation(summary = "User register", description = "Create a new user", tags = { "User Service" })
     @PostMapping("/registration")
     public User register(@Valid @RequestBody User user){

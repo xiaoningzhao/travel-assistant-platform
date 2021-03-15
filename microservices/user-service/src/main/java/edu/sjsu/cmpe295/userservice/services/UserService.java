@@ -10,6 +10,7 @@ import java.util.List;
 public interface UserService {
     User getUserByEmail(String email);
     User getUserById(Long id);
+    UserBasicInfo getUserBasicProfile(Long userId);
     User register(User user);
     User modifyUserProfile(User user);
     List<UserBasicInfo> getFriends(Long userId);
