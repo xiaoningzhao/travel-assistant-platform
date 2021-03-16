@@ -1,15 +1,21 @@
 package edu.sjsu.cmpe295.userservice.services;
 
 import edu.sjsu.cmpe295.userservice.exceptions.ConflictException;
+import edu.sjsu.cmpe295.userservice.exceptions.FileException;
 import edu.sjsu.cmpe295.userservice.exceptions.NotFoundException;
 import edu.sjsu.cmpe295.userservice.models.*;
 import edu.sjsu.cmpe295.userservice.repositories.FavoritePlaceRepository;
 import edu.sjsu.cmpe295.userservice.repositories.FriendRepository;
+import edu.sjsu.cmpe295.userservice.repositories.UserAvatarRepository;
 import edu.sjsu.cmpe295.userservice.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -20,8 +26,15 @@ public class UserServiceImpl implements UserService{
     private final UserRepository userRepository;
     private final FriendRepository friendRepository;
     private final FavoritePlaceRepository favoritePlaceRepository;
+    private final UserAvatarRepository userAvatarRepository;
 
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+
+    @Value("${image.upload.path}")
+    private String imageUploadPath;
+
+    @Value("${image.static.path}")
+    private String staticPath;
 
     @Override
     public User getUserByEmail(String email) {
@@ -189,6 +202,56 @@ public class UserServiceImpl implements UserService{
             }
         }else{
             throw new NotFoundException("User does not exist.");
+        }
+    }
+
+    @Override
+    public UserAvatar getUserAvatar(Long userId) {
+        if(userRepository.existsById(userId)){
+            if(userAvatarRepository.findById(userId).isPresent()) {
+                return userAvatarRepository.findById(userId).get();
+            }else {
+                throw new NotFoundException("User does not have avatar");
+            }
+
+        }else{
+            throw new NotFoundException("User does not exist.");
+        }
+    }
+
+    @Override
+    public UserAvatar addUserAvatar(Long userId, String avatarUrl) {
+        if(userAvatarRepository.findById(userId).isPresent()){
+            UserAvatar userAvatar = userAvatarRepository.findById(userId).get();
+            userAvatar.setAvatarUrl(avatarUrl);
+            return userAvatarRepository.save(userAvatar);
+        }else{
+            UserAvatar userAvatar = new UserAvatar();
+            userAvatar.setUserId(userId);
+            userAvatar.setAvatarUrl(avatarUrl);
+            return userAvatarRepository.save(userAvatar);
+        }
+    }
+
+    @Override
+    public String uploadUserAvatar(MultipartFile multipartFile, Long userId) {
+        String fileName = multipartFile.getOriginalFilename();
+        String suffixName = fileName != null ? fileName.substring(fileName.lastIndexOf(".")) : null;
+        String filePath = imageUploadPath +"/"+userId+"/avatar/";
+
+        fileName = UUID.randomUUID() + suffixName;
+        File file = new File(filePath + fileName);
+        if (!file.exists()) {
+            file.mkdirs();
+        }
+        try {
+            multipartFile.transferTo(file);
+            //return file path
+            return staticPath + userId + "/avatar/" + fileName;
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new FileException("File cannot save");
         }
     }
 }

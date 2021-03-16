@@ -1,9 +1,7 @@
 package edu.sjsu.cmpe295.userservice.services;
 
-import edu.sjsu.cmpe295.userservice.models.FavoritePlace;
-import edu.sjsu.cmpe295.userservice.models.Friend;
-import edu.sjsu.cmpe295.userservice.models.User;
-import edu.sjsu.cmpe295.userservice.models.UserBasicInfo;
+import edu.sjsu.cmpe295.userservice.models.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -19,4 +17,7 @@ public interface UserService {
     List<String> getFavoritePlaces(Long userId);
     FavoritePlace addFavoritePlace(Long userId, String placeId);
     FavoritePlace deleteFavoritePlace(Long userId, String placeId);
+    UserAvatar getUserAvatar(Long userId);
+    UserAvatar addUserAvatar(Long userId, String avatarUrl);
+    String uploadUserAvatar(MultipartFile multipartFile, Long userId);
 }

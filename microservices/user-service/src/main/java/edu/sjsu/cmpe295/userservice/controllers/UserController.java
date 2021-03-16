@@ -1,9 +1,7 @@
 package edu.sjsu.cmpe295.userservice.controllers;
 
-import edu.sjsu.cmpe295.userservice.models.FavoritePlace;
-import edu.sjsu.cmpe295.userservice.models.Friend;
-import edu.sjsu.cmpe295.userservice.models.User;
-import edu.sjsu.cmpe295.userservice.models.UserBasicInfo;
+import edu.sjsu.cmpe295.userservice.exceptions.ConflictException;
+import edu.sjsu.cmpe295.userservice.models.*;
 import edu.sjsu.cmpe295.userservice.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -12,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -88,6 +87,21 @@ public class UserController {
     @DeleteMapping("/places/{userId}/{placeId}")
     public FavoritePlace deleteFavoritePlace(@PathVariable Long userId, @PathVariable String placeId){
         return userService.deleteFavoritePlace(userId, placeId);
+    }
+
+    @Operation(summary = "Retrieve user's avatar url", description = "Retrieve user's avatar url", tags = { "User Service" })
+    @GetMapping("/profile/avatar/{userId}")
+    public UserAvatar getUserAvatar(@PathVariable Long userId) {
+        return userService.getUserAvatar(userId);
+    }
+
+    @PostMapping("/profile/avatar/{userId}")
+    public UserAvatar uploadUserAvatar(@RequestParam("image") MultipartFile multipartFile, @PathVariable Long userId){
+        if (multipartFile.isEmpty()) {
+            throw new ConflictException("Image file is empty");
+        }
+        String avatarUrl = userService.uploadUserAvatar(multipartFile, userId);
+        return userService.addUserAvatar(userId, avatarUrl);
     }
 
 }
