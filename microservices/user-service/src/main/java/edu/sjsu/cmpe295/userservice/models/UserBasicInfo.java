@@ -17,4 +17,6 @@ public class UserBasicInfo {
 
     private String lastName;
 
+    private String avatarUrl;
+
 }

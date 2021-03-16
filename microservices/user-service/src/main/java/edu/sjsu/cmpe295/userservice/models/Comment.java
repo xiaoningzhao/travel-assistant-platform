@@ -42,6 +42,8 @@ public class Comment {
     private String authorFirstName;
     @Transient
     private String authorLastName;
+    @Transient
+    private String authorAvatarUrl;
 
     @Schema(description = "Post created time", example = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")

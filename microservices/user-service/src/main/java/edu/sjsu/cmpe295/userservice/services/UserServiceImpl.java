@@ -118,6 +118,11 @@ public class UserServiceImpl implements UserService{
                 userBasicInfo.setEmail(user.getEmail());
                 userBasicInfo.setFirstName(user.getFirstName());
                 userBasicInfo.setLastName(user.getLastName());
+                if(userAvatarRepository.findById(friendId).isPresent()){
+                    userBasicInfo.setAvatarUrl(userAvatarRepository.findById(friendId).get().getAvatarUrl());
+                }else{
+                    userBasicInfo.setAvatarUrl("");
+                }
                 friends.add(userBasicInfo);
             }
             return friends;

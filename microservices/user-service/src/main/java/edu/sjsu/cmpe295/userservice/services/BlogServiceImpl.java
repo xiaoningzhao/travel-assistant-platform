@@ -25,6 +25,7 @@ public class BlogServiceImpl implements BlogService{
     private final LikesRepository likesRepository;
     private final PostImageRepository postImageRepository;
     private final FriendRepository friendRepository;
+    private final UserAvatarRepository userAvatarRepository;
 
     @Value("${image.upload.path}")
     private String imageUploadPath;
@@ -111,6 +112,11 @@ public class BlogServiceImpl implements BlogService{
                 User user = userRepository.findById(comment.getAuthorId()).get();
                 comment.setAuthorFirstName(user.getFirstName());
                 comment.setAuthorLastName(user.getLastName());
+                if(userAvatarRepository.findById(comment.getAuthorId()).isPresent()){
+                    comment.setAuthorAvatarUrl(userAvatarRepository.findById(comment.getAuthorId()).get().getAvatarUrl());
+                }else{
+                    comment.setAuthorAvatarUrl("");
+                }
             }
         }
         return comments;
