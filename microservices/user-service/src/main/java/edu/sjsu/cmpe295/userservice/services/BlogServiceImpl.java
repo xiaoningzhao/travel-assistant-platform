@@ -105,7 +105,15 @@ public class BlogServiceImpl implements BlogService{
 
     @Override
     public List<Comment> getComments(Long postId) {
-        return commentRepository.findAllByPostIdAndStatusOrderByCreationTimeDesc(postId, Status.ACTIVE.getName());
+        List<Comment> comments = commentRepository.findAllByPostIdAndStatusOrderByCreationTimeDesc(postId, Status.ACTIVE.getName());
+        for(Comment comment: comments){
+            if(userRepository.findById(comment.getAuthorId()).isPresent()){
+                User user = userRepository.findById(comment.getAuthorId()).get();
+                comment.setAuthorFirstName(user.getFirstName());
+                comment.setAuthorLastName(user.getLastName());
+            }
+        }
+        return comments;
     }
 
     @Override

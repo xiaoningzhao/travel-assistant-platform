@@ -38,6 +38,11 @@ public class Comment {
     @Column(name="author_id")
     private Long authorId;
 
+    @Transient
+    private String authorFirstName;
+    @Transient
+    private String authorLastName;
+
     @Schema(description = "Post created time", example = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Column(name="creation_time")
