@@ -242,11 +242,26 @@ public class UserServiceImpl implements UserService{
     public String uploadUserAvatar(MultipartFile multipartFile, Long userId) {
         String fileName = multipartFile.getOriginalFilename();
         String suffixName = fileName != null ? fileName.substring(fileName.lastIndexOf(".")) : null;
-        String filePath = imageUploadPath +"/"+userId+"/avatar/";
+        String filePath = imageUploadPath +"/"+userId+"/avatar";
 
-//        fileName = UUID.randomUUID() + suffixName;
-        fileName = "avatar" + suffixName;
-        File file = new File(filePath + fileName);
+        File dir = new File(filePath);
+        if(dir.exists()){
+            String[] content = dir.list();
+            if (content != null) {
+                for(String name : content){
+                    File temp = new File(filePath, name);
+                    if(!temp.isDirectory()){
+                        if(!temp.delete()){
+                            System.err.println("Failed to delete " + name);
+                        }
+                    }
+                }
+            }
+        }
+
+        fileName = UUID.randomUUID() + suffixName;
+//        fileName = "avatar" + suffixName;
+        File file = new File(filePath, fileName);
         if (!file.exists()) {
             file.mkdirs();
         }
