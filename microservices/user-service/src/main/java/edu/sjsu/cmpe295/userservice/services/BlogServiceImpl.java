@@ -74,6 +74,20 @@ public class BlogServiceImpl implements BlogService{
     }
 
     @Override
+    public List<Post> getAllPosts(Long userId) {
+        if(userRepository.findById(userId).isPresent()){
+            List<Long> users = friendRepository.findFriendsListByUser1Id(userId);
+            users.add(userId);
+            List<String> privacy = new ArrayList<>();
+            privacy.add(Privacy.PUBLIC.getName());
+            privacy.add(Privacy.FRIENDS.getName());
+            return postRepository.findAllByAuthorIdInAndPrivacyInAndStatusOrderByCreationTimeDesc(users, privacy, Status.ACTIVE.getName());
+        }else{
+            throw new NotFoundException("User not found");
+        }
+    }
+
+    @Override
     public Post getPostById(Long postId) {
         if(postRepository.findById(postId).isPresent()){
             return postRepository.findById(postId).get();

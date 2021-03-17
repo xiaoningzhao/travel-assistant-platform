@@ -25,10 +25,16 @@ public class BlogController {
         return blogService.getPosts(userId);
     }
 
-    @Operation(summary = "Retrieve user's posts", description = "Retrieve user's posts", tags = { "Blog Service" })
+    @Operation(summary = "Retrieve friends' posts", description = "Retrieve friends' posts", tags = { "Blog Service" })
     @GetMapping("/post/friends/{userId}")
     public List<Post> getFriendsPosts(@PathVariable Long userId) {
         return blogService.getFriendsPosts(userId);
+    }
+
+    @Operation(summary = "Retrieve user and friends' posts", description = "Retrieve user and friends' posts", tags = { "Blog Service" })
+    @GetMapping("/post/all/{userId}")
+    public List<Post> getAllPosts(@PathVariable Long userId) {
+        return blogService.getAllPosts(userId);
     }
 
     @Operation(summary = "Retrieve post", description = "Retrieve post", tags = { "Blog Service" })

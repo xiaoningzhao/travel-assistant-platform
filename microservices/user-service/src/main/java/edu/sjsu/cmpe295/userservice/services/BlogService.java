@@ -8,6 +8,7 @@ import java.util.List;
 public interface BlogService {
     List<Post> getPosts(Long userId);
     List<Post> getFriendsPosts(Long userId);
+    List<Post> getAllPosts(Long userId);
     Post getPostById(Long postId);
     Post addPost(Post post);
     Post deletePostContent(Long postId);
