@@ -244,7 +244,8 @@ public class UserServiceImpl implements UserService{
         String suffixName = fileName != null ? fileName.substring(fileName.lastIndexOf(".")) : null;
         String filePath = imageUploadPath +"/"+userId+"/avatar/";
 
-        fileName = UUID.randomUUID() + suffixName;
+//        fileName = UUID.randomUUID() + suffixName;
+        fileName = "avatar" + suffixName;
         File file = new File(filePath + fileName);
         if (!file.exists()) {
             file.mkdirs();
