@@ -5,6 +5,7 @@ import edu.sjsu.cmpe295.userservice.models.*;
 import edu.sjsu.cmpe295.userservice.services.BlogService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.lang.Nullable;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -35,6 +36,12 @@ public class BlogController {
     @GetMapping("/post/all/{userId}")
     public List<Post> getAllPosts(@PathVariable Long userId) {
         return blogService.getAllPosts(userId);
+    }
+
+    @Operation(summary = "Retrieve user and friends' posts by pages", description = "Retrieve user and friends' posts by pages", tags = { "Blog Service" })
+    @GetMapping("/post/all/{userId}/page/{pageNumber}/size/{pageSize}")
+    public List<Post> getAllPostsByPages(@PathVariable Long userId, @PathVariable @Nullable Integer pageNumber, @PathVariable Integer pageSize) {
+        return blogService.getAllPostsByPages(userId, pageNumber, pageSize);
     }
 
     @Operation(summary = "Retrieve post", description = "Retrieve post", tags = { "Blog Service" })

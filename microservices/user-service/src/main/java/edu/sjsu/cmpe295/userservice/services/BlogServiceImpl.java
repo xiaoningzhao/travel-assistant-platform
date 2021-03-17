@@ -6,6 +6,8 @@ import edu.sjsu.cmpe295.userservice.models.*;
 import edu.sjsu.cmpe295.userservice.repositories.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -81,7 +83,24 @@ public class BlogServiceImpl implements BlogService{
             List<String> privacy = new ArrayList<>();
             privacy.add(Privacy.PUBLIC.getName());
             privacy.add(Privacy.FRIENDS.getName());
+
             return postRepository.findAllByAuthorIdInAndPrivacyInAndStatusOrderByCreationTimeDesc(users, privacy, Status.ACTIVE.getName());
+        }else{
+            throw new NotFoundException("User not found");
+        }
+    }
+
+    @Override
+    public List<Post> getAllPostsByPages(Long userId, Integer pageNumber, Integer PageSize) {
+        if(userRepository.findById(userId).isPresent()){
+            List<Long> users = friendRepository.findFriendsListByUser1Id(userId);
+            users.add(userId);
+            List<String> privacy = new ArrayList<>();
+            privacy.add(Privacy.PUBLIC.getName());
+            privacy.add(Privacy.FRIENDS.getName());
+
+            Pageable pageable = PageRequest.of(pageNumber, PageSize);
+            return postRepository.findAllByAuthorIdInAndPrivacyInAndStatusOrderByCreationTimeDesc(users, privacy, Status.ACTIVE.getName(), pageable);
         }else{
             throw new NotFoundException("User not found");
         }

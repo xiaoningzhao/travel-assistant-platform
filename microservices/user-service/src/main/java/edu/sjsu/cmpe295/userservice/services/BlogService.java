@@ -9,6 +9,7 @@ public interface BlogService {
     List<Post> getPosts(Long userId);
     List<Post> getFriendsPosts(Long userId);
     List<Post> getAllPosts(Long userId);
+    List<Post> getAllPostsByPages(Long userId, Integer pageNumber, Integer PageSize);
     Post getPostById(Long postId);
     Post addPost(Post post);
     Post deletePostContent(Long postId);
