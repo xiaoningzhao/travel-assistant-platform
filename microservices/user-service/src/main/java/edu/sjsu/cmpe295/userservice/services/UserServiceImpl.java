@@ -64,6 +64,12 @@ public class UserServiceImpl implements UserService{
             userBasicInfo.setFirstName(user.getFirstName());
             userBasicInfo.setLastName(user.getLastName());
 
+            if(userAvatarRepository.findById(userId).isPresent()){
+                userBasicInfo.setAvatarUrl(userAvatarRepository.findById(userId).get().getAvatarUrl());
+            }else{
+                userBasicInfo.setAvatarUrl("");
+            }
+
             return userBasicInfo;
         }else{
             throw new NotFoundException("User does not exist.");
