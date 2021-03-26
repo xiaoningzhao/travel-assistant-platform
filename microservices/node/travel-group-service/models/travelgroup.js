@@ -1,42 +1,39 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const travelGroupSchema = new mongoose.Schema({
+const travelGroupSchema = new mongoose.Schema(
+  {
     groupName: {
-        type: String,
-        require: [true, 'Please add a name for the group'],
-        trim: true,
-        maxLength:[50, 'groupName can not be more than 50 characters']
+      type: String,
+      require: true,
+      trim: true,
+      maxLength: [50, "groupName can not be more than 50 characters"],
     },
     groupImage: {
-        type: String,
-        default: 'no-image.jpg'
+      type: String,
+      default: "no-image.jpg",
     },
     groupMembers: {
-        type: [mongoose.Schema.ObjectId],
-        ref: 'User'
+      type: [Number],
     },
     groupManagers: {
-        type: [mongoose.Schema.ObjectId],
-        ref: 'User'
+      type: [Number],
     },
     groupOwner: {
-        type: mongoose.Schema.ObjectId,
-        ref: 'User'
+      type: Number,
     },
     travelPlans: {
-        type: [mongoose.Schema.ObjectId],
-        ref: 'Travelplan'
+      type: String,
     },
     status: {
-        // 0 indicates group is suspended
-        // 1 indiccates group is active
-        type: Number,
-    }
-
-},
-    {
-        timestamps: true
-   } 
+      // 0 indicates group is suspended
+      // 1 indiccates group is active
+      type: Number,
+      default: 1,
+    },
+  },
+  {
+    timestamps: true,
+  }
 );
 
-module.exports = mongoose.model('Travelgroup', travelGroupSchema);
+module.exports = mongoose.model("Travelgroup", travelGroupSchema);
