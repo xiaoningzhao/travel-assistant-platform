@@ -1,90 +1,80 @@
-const mongoose = require('mongoose');
-const geocoder = require('../utils/geocoder');
-
+const mongoose = require("mongoose");
+const geocoder = require("../utils/geocoder");
 
 const travelplanSchema = new mongoose.Schema(
-    {
-        planName: {
-            type: String,
-            reuqired: [true, 'Please add a name'],
-            trim: true,
-            maxLength: [50, 'planName can not be more than 50 characters']
-        },
-        image: {
-            type: String,
-            default: 'no-image.jpg'
-
-        },
-
-        planDiscription: {
-            type: String,
-            trim: true,
-        },
-        startDate: Date,
-        endDate: Date,
-        cancelledDate: Date,
-        travelMembers: {
-            type: [mongoose.Schema.ObjectId],
-            ref: 'User'
-        },
-        initiator: {
-            type: mongoose.Schema.ObjectId,
-            ref: 'User'
-        },
-        travelGroup: {
-            type: mongoose.Schema.ObjectId,
-            ref: 'Travelgroup'
-        },
-        likes: {
-            type: [mongoose.Schema.ObjectId],
-            ref: 'User'
-        },
-        dislikes: {
-            type: [mongoose.Schema.ObjectId],
-            ref: 'User'
-        },
-        //0 denotes cancelled
-        //1 denotes plan is ongoing
-        //2 denotes plan is completed
-        //3 denotes plan is published to a group
-        //4 denotes plan is created
-        status: {
-            type: Number,
-            default: 4
-
-        },
-        comments: [
-            {
-                user: {
-                    type: mongoose.Schema.ObjectId,
-                    ref: 'User'
-                },
-                text: {
-                    type: String,
-                    required: [true, 'Please add your comment']
-                },
-                name: {
-                    type: String
-                },
-                date: {
-                    type: Date,
-                    default: Date.now
-                }
-
-            }
-        ],
-        departureAddress: {
-            type: String,
-            trim: true
-        },
-        destinationAddress: [String]
+  {
+    planName: {
+      type: String,
+      reuqired: [true, "Please add a name"],
+      trim: true,
+      maxLength: [50, "planName can not be more than 50 characters"],
     },
-    {
-        timestamps: true
-    }
+    image: {
+      type: String,
+      default: "no-image.jpg",
+    },
+
+    planDescription: {
+      type: String,
+      trim: true,
+    },
+    startDate: Date,
+    endDate: Date,
+    cancelledDate: Date,
+    travelMembers: {
+      type: [Number],
+    },
+    initiator: {
+      type: Number,
+    },
+    travelGroup: {
+      type: String,
+    },
+    likes: {
+      type: [Number],
+    },
+    dislikes: {
+      type: [Number],
+    },
+    //0 denotes cancelled
+    //1 denotes plan is ongoing
+    //2 denotes plan is completed
+
+    //3 denotes plan is created
+    status: {
+      type: Number,
+      default: 3,
+    },
+    comments: [
+      {
+        user: {
+          type: Number,
+        },
+        text: {
+          type: String,
+          required: [true, "Please add your comment"],
+        },
+        name: {
+          type: String,
+        },
+        date: {
+          type: Date,
+          default: Date.now,
+        },
+      },
+    ],
+    departureAddress: {
+      type: String,
+      trim: true,
+    },
+    destinationAddress: [String],
+  },
+  {
+    timestamps: true,
+  }
 );
 
-//Reverse populate departure address with virtuals 
+//Reverse populate departure address with virtuals
 // travelplanSchema.virtual('departureAddress', {
 //     ref: 'Address',
 //     localField: '_id',
@@ -95,7 +85,7 @@ const travelplanSchema = new mongoose.Schema(
 
 // });
 
-//Reverse populate destination addresses with virtuals 
+//Reverse populate destination addresses with virtuals
 // travelplanSchema.virtual('destinationAddresses', {
 //     ref: 'Address',
 //     localField: '_id',
@@ -114,9 +104,4 @@ const travelplanSchema = new mongoose.Schema(
 //     options: {sort:{createdAt: - 1}}
 // })
 
-
-
-
-
-
-module.exports = mongoose.model('Travelplan', travelplanSchema);
+module.exports = mongoose.model("Travelplan", travelplanSchema);
