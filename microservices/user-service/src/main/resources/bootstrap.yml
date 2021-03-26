@@ -15,15 +15,26 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
   datasource:
-    url: jdbc:mysql://${MYSQL_HOST:127.0.0.1}:3306/tap?serverTimezone=UTC
+    url: jdbc:mysql://${MYSQL_HOST:tap-db-mysql}:3306/tap?serverTimezone=UTC
+#    url: jdbc:mysql://${MYSQL_HOST:localhost}:3306/tap?serverTimezone=UTC
     username: xiaoning
     password: password
+
+image:
+  upload:
+    path: /usr/local/tap/image/
+#    path: C://user-photos/
+  static:
+    path: /image/
+
 
 server:
   port: 8081
 
 eureka:
+  instance:
+    prefer-ip-address: true
   client:
     serviceUrl:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: http://tap-registry-service:8761/eureka/
 

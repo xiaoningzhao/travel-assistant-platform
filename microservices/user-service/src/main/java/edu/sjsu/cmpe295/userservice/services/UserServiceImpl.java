@@ -1,18 +1,22 @@
 package edu.sjsu.cmpe295.userservice.services;
 
 import edu.sjsu.cmpe295.userservice.exceptions.ConflictException;
+import edu.sjsu.cmpe295.userservice.exceptions.FileException;
 import edu.sjsu.cmpe295.userservice.exceptions.NotFoundException;
-import edu.sjsu.cmpe295.userservice.models.FavoritePlace;
-import edu.sjsu.cmpe295.userservice.models.Friend;
-import edu.sjsu.cmpe295.userservice.models.FriendId;
-import edu.sjsu.cmpe295.userservice.models.User;
+import edu.sjsu.cmpe295.userservice.models.*;
 import edu.sjsu.cmpe295.userservice.repositories.FavoritePlaceRepository;
 import edu.sjsu.cmpe295.userservice.repositories.FriendRepository;
+import edu.sjsu.cmpe295.userservice.repositories.UserAvatarRepository;
 import edu.sjsu.cmpe295.userservice.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,8 +26,15 @@ public class UserServiceImpl implements UserService{
     private final UserRepository userRepository;
     private final FriendRepository friendRepository;
     private final FavoritePlaceRepository favoritePlaceRepository;
+    private final UserAvatarRepository userAvatarRepository;
 
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+
+    @Value("${image.upload.path}")
+    private String imageUploadPath;
+
+    @Value("${image.static.path}")
+    private String staticPath;
 
     @Override
     public User getUserByEmail(String email) {
@@ -44,9 +55,31 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
+    public UserBasicInfo getUserBasicProfile(Long userId) {
+        if (userRepository.findById(userId).isPresent()){
+            User user = userRepository.findById(userId).get();
+            UserBasicInfo userBasicInfo = new UserBasicInfo();
+            userBasicInfo.setId(user.getId());
+            userBasicInfo.setEmail(user.getEmail());
+            userBasicInfo.setFirstName(user.getFirstName());
+            userBasicInfo.setLastName(user.getLastName());
+
+            if(userAvatarRepository.findById(userId).isPresent()){
+                userBasicInfo.setAvatarUrl(userAvatarRepository.findById(userId).get().getAvatarUrl());
+            }else{
+                userBasicInfo.setAvatarUrl("");
+            }
+
+            return userBasicInfo;
+        }else{
+            throw new NotFoundException("User does not exist.");
+        }
+    }
+
+    @Override
     public User register(User user) {
         if (!userRepository.existsByEmail(user.getEmail())) {
-            user.setActive(false);
+            user.setActive(true);
             user.setRole("ROLE_USER");
             user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
             String token = UUID.randomUUID().toString().replace("-", "");
@@ -80,17 +113,34 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public List<String> getFriends(Long userId) {
+    public List<UserBasicInfo> getFriends(Long userId) {
         if(userRepository.existsById(userId)) {
-            return friendRepository.findFriendsListByUser1Id(userId);
+            List<Long> friendIds = friendRepository.findFriendsListByUser1Id(userId);
+            List<UserBasicInfo> friends = new ArrayList<>();
+            for(Long friendId : friendIds){
+                UserBasicInfo userBasicInfo = new UserBasicInfo();
+                User user = userRepository.findById(friendId).get();
+                userBasicInfo.setId(friendId);
+                userBasicInfo.setEmail(user.getEmail());
+                userBasicInfo.setFirstName(user.getFirstName());
+                userBasicInfo.setLastName(user.getLastName());
+                if(userAvatarRepository.findById(friendId).isPresent()){
+                    userBasicInfo.setAvatarUrl(userAvatarRepository.findById(friendId).get().getAvatarUrl());
+                }else{
+                    userBasicInfo.setAvatarUrl("");
+                }
+                friends.add(userBasicInfo);
+            }
+            return friends;
         }else{
             throw new NotFoundException("User does not exist.");
         }
     }
 
     @Override
-    public Friend addNewFriend(Long user1Id, Long user2Id) {
-        if(userRepository.existsById(user1Id) && userRepository.existsById(user2Id)){
+    public Friend addNewFriend(Long user1Id, String user2email) {
+        if(userRepository.existsById(user1Id) && userRepository.existsByEmail(user2email)){
+            Long user2Id = userRepository.findByEmail(user2email).getId();
             FriendId friendId = new FriendId();
             friendId.setUser1Id(user1Id);
             friendId.setUser2Id(user2Id);
@@ -108,8 +158,9 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public Friend deleteFriend(Long user1Id, Long user2Id) {
-        if(userRepository.existsById(user1Id) && userRepository.existsById(user2Id)){
+    public Friend deleteFriend(Long user1Id, String user2email) {
+        if(userRepository.existsById(user1Id) && userRepository.existsByEmail(user2email)){
+            Long user2Id = userRepository.findByEmail(user2email).getId();
             FriendId friendId = new FriendId();
             friendId.setUser1Id(user1Id);
             friendId.setUser2Id(user2Id);
@@ -135,15 +186,28 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public FavoritePlace addFavoritePlace(Long userId, String placeId) {
-        if(userRepository.existsById(userId)){
-            if(favoritePlaceRepository.findFavoritePlaceByUserIdAndPlaceId(userId, placeId) == null){
-                FavoritePlace favoritePlace = new FavoritePlace();
-                favoritePlace.setUserId(userId);
-                favoritePlace.setPlaceId(placeId);
+    public List<FavoritePlace> getFavoritePlacesDetail(Long userId) {
+        if(userRepository.existsById(userId)) {
+            return favoritePlaceRepository.findAllByUserId(userId);
+        }else{
+            throw new NotFoundException("User does not exist.");
+        }
+    }
+
+    @Override
+    public FavoritePlace addFavoritePlace(FavoritePlace favoritePlace) {
+        if(userRepository.existsById(favoritePlace.getUserId())){
+            if(favoritePlaceRepository.findFavoritePlaceByUserIdAndPlaceId(favoritePlace.getUserId(), favoritePlace.getPlaceId()) == null){
                 return favoritePlaceRepository.save(favoritePlace);
             }else{
-                throw new ConflictException("Favorite place already exists.");
+                FavoritePlace place = favoritePlaceRepository.findFavoritePlaceByUserIdAndPlaceId(favoritePlace.getUserId(), favoritePlace.getPlaceId());
+                place.setPlaceName(favoritePlace.getPlaceName());
+                place.setPlaceAddress(favoritePlace.getPlaceAddress());
+                place.setPlaceLat(favoritePlace.getPlaceLat());
+                place.setPlaceLng(favoritePlace.getPlaceLng());
+                place.setPlacePhone(favoritePlace.getPlacePhone());
+                place.setPlaceRating(favoritePlace.getPlaceRating());
+                return favoritePlaceRepository.save(place);
             }
         }else{
             throw new NotFoundException("User does not exist.");
@@ -162,6 +226,72 @@ public class UserServiceImpl implements UserService{
             }
         }else{
             throw new NotFoundException("User does not exist.");
+        }
+    }
+
+    @Override
+    public UserAvatar getUserAvatar(Long userId) {
+        if(userRepository.existsById(userId)){
+            if(userAvatarRepository.findById(userId).isPresent()) {
+                return userAvatarRepository.findById(userId).get();
+            }else {
+                throw new NotFoundException("User does not have avatar");
+            }
+
+        }else{
+            throw new NotFoundException("User does not exist.");
+        }
+    }
+
+    @Override
+    public UserAvatar addUserAvatar(Long userId, String avatarUrl) {
+        if(userAvatarRepository.findById(userId).isPresent()){
+            UserAvatar userAvatar = userAvatarRepository.findById(userId).get();
+            userAvatar.setAvatarUrl(avatarUrl);
+            return userAvatarRepository.save(userAvatar);
+        }else{
+            UserAvatar userAvatar = new UserAvatar();
+            userAvatar.setUserId(userId);
+            userAvatar.setAvatarUrl(avatarUrl);
+            return userAvatarRepository.save(userAvatar);
+        }
+    }
+
+    @Override
+    public String uploadUserAvatar(MultipartFile multipartFile, Long userId) {
+        String fileName = multipartFile.getOriginalFilename();
+        String suffixName = fileName != null ? fileName.substring(fileName.lastIndexOf(".")) : null;
+        String filePath = imageUploadPath +"/"+userId+"/avatar";
+
+        File dir = new File(filePath);
+        if(dir.exists()){
+            String[] content = dir.list();
+            if (content != null) {
+                for(String name : content){
+                    File temp = new File(filePath, name);
+                    if(!temp.isDirectory()){
+                        if(!temp.delete()){
+                            System.err.println("Failed to delete " + name);
+                        }
+                    }
+                }
+            }
+        }
+
+        fileName = UUID.randomUUID() + suffixName;
+//        fileName = "avatar" + suffixName;
+        File file = new File(filePath, fileName);
+        if (!file.exists()) {
+            file.mkdirs();
+        }
+        try {
+            multipartFile.transferTo(file);
+            //return file path
+            return staticPath + userId + "/avatar/" + fileName;
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new FileException("File cannot save");
         }
     }
 }

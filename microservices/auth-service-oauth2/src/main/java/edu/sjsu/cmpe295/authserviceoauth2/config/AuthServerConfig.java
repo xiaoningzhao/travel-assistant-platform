@@ -49,8 +49,8 @@ public class AuthServerConfig extends AuthorizationServerConfigurerAdapter {
                 .secret(passwordEncoder.encode("123456"))
                 .scopes("all")
                 .authorizedGrantTypes("password", "refresh_token")
-                .accessTokenValiditySeconds(3600)
-                .refreshTokenValiditySeconds(86400);
+                .accessTokenValiditySeconds(86400)
+                .refreshTokenValiditySeconds(172800);
     }
 
     @Override
@@ -81,8 +81,8 @@ public class AuthServerConfig extends AuthorizationServerConfigurerAdapter {
         return (e) -> {
             HttpHeaders headers = new HttpHeaders();
             headers.set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
-            headers.set("Access-Control-Allow-Origin", "*");
-            headers.set("Cache-Control", "no-cache");
+//            headers.set("Access-Control-Allow-Origin", "*");
+//            headers.set("Cache-Control", "no-cache");
             ResponseMessage responseMessage;
             responseMessage = new ResponseMessage(LocalDateTime.now().toString(), HttpStatus.UNAUTHORIZED.value(), "Unauthorized", "Authorization Server: "+e.getMessage());
             return new ResponseEntity<ResponseMessage>(responseMessage, headers, HttpStatus.UNAUTHORIZED);
@@ -94,8 +94,8 @@ public class AuthServerConfig extends AuthorizationServerConfigurerAdapter {
         return (request, response, e) -> {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             response.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
-            response.setHeader("Access-Control-Allow-Origin", "*");
-            response.setHeader("Cache-Control", "no-cache");
+//            response.setHeader("Access-Control-Allow-Origin", "*");
+//            response.setHeader("Cache-Control", "no-cache");
             ResponseMessage responseMessage = new ResponseMessage(LocalDateTime.now().toString(), HttpStatus.UNAUTHORIZED.value(), "Unauthorized", "Authorization Server: Not login");
             response.getWriter().print(JSONUtil.toJsonStr(responseMessage));
             response.getWriter().flush();
@@ -107,8 +107,8 @@ public class AuthServerConfig extends AuthorizationServerConfigurerAdapter {
         return (request, response, e) -> {
             response.setStatus(HttpStatus.FORBIDDEN.value());
             response.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
-            response.setHeader("Access-Control-Allow-Origin", "*");
-            response.setHeader("Cache-Control", "no-cache");
+//            response.setHeader("Access-Control-Allow-Origin", "*");
+//            response.setHeader("Cache-Control", "no-cache");
             ResponseMessage responseMessage = new ResponseMessage(LocalDateTime.now().toString(), HttpStatus.FORBIDDEN.value(), "Unauthorized", "Authorization Server: "+e.getMessage());
             response.getWriter().print(JSONUtil.toJsonStr(responseMessage));
             response.getWriter().flush();

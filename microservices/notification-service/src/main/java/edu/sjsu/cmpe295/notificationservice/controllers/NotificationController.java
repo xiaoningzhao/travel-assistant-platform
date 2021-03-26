@@ -38,4 +38,17 @@ public class NotificationController {
 
     }
 
+    @Operation(summary = "Receive notifications by user", description = "Receive notifications by user", tags = { "Notification" })
+    @GetMapping("/receive/{userId}")
+    public List<Notification> getNotificationsByUserId(@PathVariable String userId){
+        return notificationService.getNotificationByUser(userId);
+    }
+
+    @Operation(summary = "Send notification to all users", description = "Send notification to all users", tags = { "Notification" })
+    @PutMapping("/read/{id}")
+    public ResponseMessage setNotificationAsRead(@PathVariable Long id){
+        notificationService.setNotificationAsRead(id);
+        return new ResponseMessage(LocalDateTime.now().toString(), HttpStatus.OK.value(),"Updated Successful","");
+    }
+
 }

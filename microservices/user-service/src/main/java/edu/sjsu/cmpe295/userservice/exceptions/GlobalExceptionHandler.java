@@ -33,6 +33,12 @@ public class GlobalExceptionHandler {
         return new ResponseMessage(LocalDateTime.now().toString(), HttpStatus.NOT_FOUND.value(), e.getClass().getSimpleName(), e.getMessage());
     }
 
+    @ExceptionHandler(FileException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ResponseMessage handleFileException(Exception e){
+        return new ResponseMessage(LocalDateTime.now().toString(), HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getClass().getSimpleName(), e.getMessage());
+    }
+
     @ExceptionHandler({MethodArgumentNotValidException.class, ConstraintViolationException.class, InvalidDataAccessApiUsageException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseMessage handleMethodArgumentNotValidException(Exception e){

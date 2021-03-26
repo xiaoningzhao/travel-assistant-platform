@@ -1,8 +1,7 @@
 package edu.sjsu.cmpe295.userservice.controllers;
 
-import edu.sjsu.cmpe295.userservice.models.FavoritePlace;
-import edu.sjsu.cmpe295.userservice.models.Friend;
-import edu.sjsu.cmpe295.userservice.models.User;
+import edu.sjsu.cmpe295.userservice.exceptions.ConflictException;
+import edu.sjsu.cmpe295.userservice.models.*;
 import edu.sjsu.cmpe295.userservice.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -11,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -32,6 +32,13 @@ public class UserController {
         return userService.getUserByEmail(email);
     }
 
+    @Operation(summary = "Retrieve user basic information by user ID", description = "Retrieve user basic information by user ID", tags = { "User Service" })
+    @GetMapping("/profile/basic/{userId}")
+    public UserBasicInfo getUserBasicProfile(@Parameter(description = "User ID")
+                               @PathVariable @NotNull Long userId) {
+        return userService.getUserBasicProfile(userId);
+    }
+
     @Operation(summary = "User register", description = "Create a new user", tags = { "User Service" })
     @PostMapping("/registration")
     public User register(@Valid @RequestBody User user){
@@ -48,20 +55,20 @@ public class UserController {
 
     @Operation(summary = "Retrieve user's friends' ID", description = "Retrieve user's friends' ID", tags = { "User Service" })
     @GetMapping("/friends/{userId}")
-    public List<String> getFriend(@PathVariable Long userId) {
+    public List<UserBasicInfo> getFriend(@PathVariable Long userId) {
         return userService.getFriends(userId);
     }
 
     @Operation(summary = "Add a friend", description = "Create a new friendship relation between user1 and user2", tags = { "User Service" })
-    @PostMapping("/friends/{user1Id}/{user2Id}")
-    public Friend addNewFriend(@PathVariable Long user1Id, @PathVariable Long user2Id){
-        return userService.addNewFriend(user1Id, user2Id);
+    @PostMapping("/friends/{user1Id}/{user2email}")
+    public Friend addNewFriend(@PathVariable Long user1Id, @PathVariable String user2email){
+        return userService.addNewFriend(user1Id, user2email);
     }
 
     @Operation(summary = "Delete a friend", description = "Delete a friendship relation between user1 and user2", tags = { "User Service" })
-    @DeleteMapping("/friends/{user1Id}/{user2Id}")
-    public Friend deleteFriend(@PathVariable Long user1Id, @PathVariable Long user2Id){
-        return userService.deleteFriend(user1Id, user2Id);
+    @DeleteMapping("/friends/{user1Id}/{user2email}")
+    public Friend deleteFriend(@PathVariable Long user1Id, @PathVariable String user2email){
+        return userService.deleteFriend(user1Id, user2email);
     }
 
     @Operation(summary = "Retrieve user's favorite places", description = "Retrieve user's favorite places", tags = { "User Service" })
@@ -70,16 +77,37 @@ public class UserController {
         return userService.getFavoritePlaces(userId);
     }
 
+    @Operation(summary = "Retrieve user's favorite places with detailed information", description = "Retrieve user's favorite places with detailed information", tags = { "User Service" })
+    @GetMapping("/places/detail/{userId}")
+    public List<FavoritePlace> getFavoritePlacesDetail(@PathVariable Long userId) {
+        return userService.getFavoritePlacesDetail(userId);
+    }
+
     @Operation(summary = "Add a favorite place", description = "Add a favorite place", tags = { "User Service" })
-    @PostMapping("/places/{userId}/{placeId}")
-    public FavoritePlace addFavoritePlace(@PathVariable Long userId, @PathVariable String placeId){
-        return userService.addFavoritePlace(userId, placeId);
+    @PostMapping("/places")
+    public FavoritePlace addFavoritePlace(@Valid @RequestBody FavoritePlace favoritePlace){
+        return userService.addFavoritePlace(favoritePlace);
     }
 
     @Operation(summary = "Delete a favorite place", description = "Delete a favorite place", tags = { "User Service" })
     @DeleteMapping("/places/{userId}/{placeId}")
     public FavoritePlace deleteFavoritePlace(@PathVariable Long userId, @PathVariable String placeId){
         return userService.deleteFavoritePlace(userId, placeId);
+    }
+
+    @Operation(summary = "Retrieve user's avatar url", description = "Retrieve user's avatar url", tags = { "User Service" })
+    @GetMapping("/profile/avatar/{userId}")
+    public UserAvatar getUserAvatar(@PathVariable Long userId) {
+        return userService.getUserAvatar(userId);
+    }
+
+    @PostMapping("/profile/avatar/{userId}")
+    public UserAvatar uploadUserAvatar(@RequestParam("image") MultipartFile multipartFile, @PathVariable Long userId){
+        if (multipartFile.isEmpty()) {
+            throw new ConflictException("Image file is empty");
+        }
+        String avatarUrl = userService.uploadUserAvatar(multipartFile, userId);
+        return userService.addUserAvatar(userId, avatarUrl);
     }
 
 }

@@ -8,7 +8,6 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -20,9 +19,6 @@ public class NotificationServiceImpl implements NotificationService{
     private static final String WS_MESSAGE_TRANSFER_DESTINATION = "/topic/notification";
     private static final String WS_MESSAGE_TRANSFER_INDIVIDUAL_DESTINATION = "/msg";
 
-    //Connected users' list, format <sessionId, userId>
-    private final HashMap<String, String> connectedUsers = new HashMap<>();
-
     @Override
     public void sendNotificationToAll(Notification notification) {
         simpMessagingTemplate.convertAndSend(WS_MESSAGE_TRANSFER_DESTINATION,
@@ -31,30 +27,12 @@ public class NotificationServiceImpl implements NotificationService{
 
     @Override
     public void sendNotificationToUser(String userId, Notification notification) {
-        if(this.connectedUsers.containsValue(userId)) {
-            notification.setToUserId(userId);
-            notification.setTimestamp(LocalDateTime.now().toString());
-            notification.setReceived(true);
-            notificationRepository.save(notification);
-            simpMessagingTemplate.convertAndSendToUser(userId, WS_MESSAGE_TRANSFER_INDIVIDUAL_DESTINATION, notification);
-        }else{
-            notification.setToUserId(userId);
-            notification.setTimestamp(LocalDateTime.now().toString());
-            notification.setReceived(false);
-            notificationRepository.save(notification);
-        }
-    }
-
-    @Override
-    public void sendMissedNotificationToUser(String userId){
-        List<Notification> notifications = notificationRepository.findAllByToUserIdAndReceivedIsFalse(userId);
-        if(!notifications.isEmpty()){
-            notifications.forEach(notification -> {
-                simpMessagingTemplate.convertAndSendToUser(userId, WS_MESSAGE_TRANSFER_INDIVIDUAL_DESTINATION, notification);
-                notification.setReceived(true);
-                notificationRepository.save(notification);
-            });
-        }
+        notification.setToUserId(userId);
+        notification.setTimestamp(LocalDateTime.now().toString());
+        notification.setRead(false);
+        notification.setReceived(true);
+        notificationRepository.save(notification);
+        simpMessagingTemplate.convertAndSendToUser(userId, WS_MESSAGE_TRANSFER_INDIVIDUAL_DESTINATION, notification);
     }
 
     @Override
@@ -77,17 +55,13 @@ public class NotificationServiceImpl implements NotificationService{
     }
 
     @Override
-    public HashMap<String, String> getConnectedUsers(){
-        return connectedUsers;
-    }
-
-    @Override
-    public void addConnectedUser(String userId, String sessionId){
-        this.connectedUsers.put(sessionId, userId);
-    }
-
-    @Override
-    public void removeConnectedUser(String sessionId){
-        this.connectedUsers.remove(sessionId);
+    public void setNotificationAsRead(Long id) {
+        if(notificationRepository.existsById(id)){
+            Notification notification = notificationRepository.findById(id).get();
+            notification.setRead(true);
+            notificationRepository.save(notification);
+        }else {
+            throw new NotFoundException("No such notification");
+        }
     }
 }
