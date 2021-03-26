@@ -15,7 +15,8 @@ public interface UserService {
     Friend addNewFriend(Long user1Id, String user2email);
     Friend deleteFriend(Long user1Id, String user2email);
     List<String> getFavoritePlaces(Long userId);
-    FavoritePlace addFavoritePlace(Long userId, String placeId);
+    List<FavoritePlace> getFavoritePlacesDetail(Long userId);
+    FavoritePlace addFavoritePlace(FavoritePlace favoritePlace);
     FavoritePlace deleteFavoritePlace(Long userId, String placeId);
     UserAvatar getUserAvatar(Long userId);
     UserAvatar addUserAvatar(Long userId, String avatarUrl);

@@ -77,10 +77,16 @@ public class UserController {
         return userService.getFavoritePlaces(userId);
     }
 
+    @Operation(summary = "Retrieve user's favorite places with detailed information", description = "Retrieve user's favorite places with detailed information", tags = { "User Service" })
+    @GetMapping("/places/detail/{userId}")
+    public List<FavoritePlace> getFavoritePlacesDetail(@PathVariable Long userId) {
+        return userService.getFavoritePlacesDetail(userId);
+    }
+
     @Operation(summary = "Add a favorite place", description = "Add a favorite place", tags = { "User Service" })
-    @PostMapping("/places/{userId}/{placeId}")
-    public FavoritePlace addFavoritePlace(@PathVariable Long userId, @PathVariable String placeId){
-        return userService.addFavoritePlace(userId, placeId);
+    @PostMapping("/places")
+    public FavoritePlace addFavoritePlace(@Valid @RequestBody FavoritePlace favoritePlace){
+        return userService.addFavoritePlace(favoritePlace);
     }
 
     @Operation(summary = "Delete a favorite place", description = "Delete a favorite place", tags = { "User Service" })

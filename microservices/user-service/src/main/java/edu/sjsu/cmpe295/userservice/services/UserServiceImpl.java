@@ -186,15 +186,28 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public FavoritePlace addFavoritePlace(Long userId, String placeId) {
-        if(userRepository.existsById(userId)){
-            if(favoritePlaceRepository.findFavoritePlaceByUserIdAndPlaceId(userId, placeId) == null){
-                FavoritePlace favoritePlace = new FavoritePlace();
-                favoritePlace.setUserId(userId);
-                favoritePlace.setPlaceId(placeId);
+    public List<FavoritePlace> getFavoritePlacesDetail(Long userId) {
+        if(userRepository.existsById(userId)) {
+            return favoritePlaceRepository.findAllByUserId(userId);
+        }else{
+            throw new NotFoundException("User does not exist.");
+        }
+    }
+
+    @Override
+    public FavoritePlace addFavoritePlace(FavoritePlace favoritePlace) {
+        if(userRepository.existsById(favoritePlace.getUserId())){
+            if(favoritePlaceRepository.findFavoritePlaceByUserIdAndPlaceId(favoritePlace.getUserId(), favoritePlace.getPlaceId()) == null){
                 return favoritePlaceRepository.save(favoritePlace);
             }else{
-                throw new ConflictException("Favorite place already exists.");
+                FavoritePlace place = favoritePlaceRepository.findFavoritePlaceByUserIdAndPlaceId(favoritePlace.getUserId(), favoritePlace.getPlaceId());
+                place.setPlaceName(favoritePlace.getPlaceName());
+                place.setPlaceAddress(favoritePlace.getPlaceAddress());
+                place.setPlaceLat(favoritePlace.getPlaceLat());
+                place.setPlaceLng(favoritePlace.getPlaceLng());
+                place.setPlacePhone(favoritePlace.getPlacePhone());
+                place.setPlaceRating(favoritePlace.getPlaceRating());
+                return favoritePlaceRepository.save(place);
             }
         }else{
             throw new NotFoundException("User does not exist.");
