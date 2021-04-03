@@ -12,6 +12,7 @@ const {
   getSingleTravelgroup,
   getTravelgroupsUserIdIn,
   uploadImageToTravelgroup,
+  updateGroupInfo,
 } = require("../controllers/travelgroupController");
 const { route } = require("./travelplanRoute");
 
@@ -48,5 +49,6 @@ router.route("/update/close/:userId/:groupId").delete(deleteTravelgroup);
 
 //delete/:userId/:groupId/:deleteUserId
 router.route("/delete/:userId/:groupId/:deleteUserId").delete(deleteMember);
+router.route("/updateinfo/:userId/:groupId").put(updateGroupInfo);
 
 module.exports = router;

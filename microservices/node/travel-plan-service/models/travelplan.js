@@ -13,6 +13,7 @@ const travelplanSchema = new mongoose.Schema(
       type: String,
       default: "no-image.jpg",
     },
+    estimatedStartDate: String,
 
     planDescription: {
       type: String,
@@ -20,7 +21,7 @@ const travelplanSchema = new mongoose.Schema(
     },
     startDate: Date,
     endDate: Date,
-    cancelledDate: Date,
+
     travelMembers: {
       type: [Number],
     },
@@ -36,14 +37,14 @@ const travelplanSchema = new mongoose.Schema(
     dislikes: {
       type: [Number],
     },
-    //0 denotes cancelled
-    //1 denotes plan is ongoing
-    //2 denotes plan is completed
+    //0 denotes created
+    //1 denotes published to a group
+    //2 ongoing
 
-    //3 denotes plan is created
+    //3 ended
     status: {
       type: Number,
-      default: 3,
+      default: 0,
     },
     comments: [
       {
@@ -54,7 +55,7 @@ const travelplanSchema = new mongoose.Schema(
           type: String,
           required: [true, "Please add your comment"],
         },
-        name: {
+        title: {
           type: String,
         },
         date: {
@@ -63,11 +64,23 @@ const travelplanSchema = new mongoose.Schema(
         },
       },
     ],
+    destinationAddress: [
+      {
+        placeId: String,
+        title: String,
+        address: String,
+        lat: Number,
+        lng: Number,
+      },
+    ],
+
     departureAddress: {
-      type: String,
-      trim: true,
+      placeId: String,
+      title: String,
+      address: String,
+      lat: Number,
+      lng: Number,
     },
-    destinationAddress: [String],
   },
   {
     timestamps: true,

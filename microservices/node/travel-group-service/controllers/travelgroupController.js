@@ -489,15 +489,15 @@ exports.deleteMember = asyncHandler(async (req, res, next) => {
   if (req.params.userId === req.params.newOwnerId) {
     return next(new ErrorResponse("Duplicate userId", 400));
   }
-  const user = await User.findById(req.params.userId);
-  if (!user) {
-    return next(
-      new ErrorResponse(
-        `The user with Id ${req.params.userId} is not a valid userId`,
-        400
-      )
-    );
-  }
+  // const user = await User.findById(req.params.userId);
+  // if (!user) {
+  //   return next(
+  //     new ErrorResponse(
+  //       `The user with Id ${req.params.userId} is not a valid userId`,
+  //       400
+  //     )
+  //   );
+  // }
 
   const travelgroup = await Travelgroup.findById(req.params.groupId);
   if (!travelgroup) {
@@ -590,15 +590,15 @@ exports.deleteMember = asyncHandler(async (req, res, next) => {
 //@route DELETE v1/travelgroups/update/close/:userId/:groupId
 //@access group owner
 exports.deleteTravelgroup = asyncHandler(async (req, res, next) => {
-  const user = await User.findById(req.params.userId);
-  if (!user) {
-    return next(
-      new ErrorResponse(
-        `The user with Id ${req.params.userId} is not a valid userId`,
-        400
-      )
-    );
-  }
+  // const user = await User.findById(req.params.userId);
+  // if (!user) {
+  //   return next(
+  //     new ErrorResponse(
+  //       `The user with Id ${req.params.userId} is not a valid userId`,
+  //       400
+  //     )
+  //   );
+  // }
 
   const travelgroup = await Travelgroup.findById(req.params.groupId);
   if (!travelgroup) {
@@ -694,4 +694,26 @@ exports.uploadImageToTravelgroup = asyncHandler(async (req, res, next) => {
       data: file.name,
     });
   });
+});
+
+//@desc Upload image for a travelgroup
+//@route PUT /api/v1/travelgroup/updateinfo/:userId/:groupId
+//@access Private
+exports.updateGroupInfo = asyncHandler(async (req, res, next) => {
+  const travelgroup = await Travelgroup.findById(req.params.groupId);
+  if (!travelgroup) {
+    return next(
+      new ErrorResponse(
+        `The travelgroup with Id ${req.params.groupId} is not a valid groupId`,
+        400
+      )
+    );
+  }
+
+  await Travelgroup.findByIdAndUpdate(req.params.groupId, req.body, {
+    new: true,
+    runValidators: true,
+  });
+
+  res.status(200).json({ success: true });
 });
