@@ -4,6 +4,7 @@ const Travelgroup = require("../models/travelgroup");
 const User = require("../models/User");
 const mongoose = require("mongoose");
 const path = require("path");
+const fs = require("fs");
 
 //@desc Get all travelgroups
 //@route GET /api/v1/travelgroup/read
@@ -657,6 +658,11 @@ exports.uploadImageToTravelgroup = asyncHandler(async (req, res, next) => {
   if (!req.files) {
     return next(new ErrorResponse("Please upload a file", 400));
   }
+  const imageToBeDelete = travelgroup[0].groupImage
+    ? travelgroup[0].groupImage
+    : null;
+
+  console.log(imageToBeDelete);
 
   const file = req.files.file;
 
@@ -689,6 +695,18 @@ exports.uploadImageToTravelgroup = asyncHandler(async (req, res, next) => {
       groupImage: file.name,
     });
 
+    //Delete the old image
+    if (imageToBeDelete && imageToBeDelete !== "no-image.jpg") {
+      fs.unlink(
+        `${process.env.FILE_UPLOAD_PATH}/${imageToBeDelete}`,
+        (error) => {
+          if (error) {
+            console.log(error);
+          }
+        }
+      );
+    }
+
     res.status(200).json({
       success: true,
       data: file.name,
@@ -696,7 +714,7 @@ exports.uploadImageToTravelgroup = asyncHandler(async (req, res, next) => {
   });
 });
 
-//@desc Upload image for a travelgroup
+//@desc Update group information
 //@route PUT /api/v1/travelgroup/updateinfo/:userId/:groupId
 //@access Private
 exports.updateGroupInfo = asyncHandler(async (req, res, next) => {

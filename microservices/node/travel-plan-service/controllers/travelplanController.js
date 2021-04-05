@@ -4,6 +4,7 @@ const Travelplan = require("../models/travelplan");
 
 const OngoingTravelplan = require("../models/ongoingTravelplan");
 const path = require("path");
+const fs = require("fs");
 
 //@desc Get Single travelplan
 //@route GET /api/v1/travelplan/read/:planId
@@ -233,7 +234,7 @@ exports.disLikeTravelplan = asyncHandler(async (req, res, next) => {
     // travelplan = await Travelplan.findByIdAndUpdate()
   } else {
     res.status(400).json({
-      message: "User already disliked this travelplan",
+      message: "You already disliked this travelplan",
     });
   }
 });
@@ -317,6 +318,8 @@ exports.uploadImageToTravelplan = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse("Please upload a file", 400));
   }
 
+  const imageToBeDelete = travelplan[0].image ? travelplan[0].image : null;
+
   const file = req.files.file;
 
   if (!file.mimetype.startsWith("image")) {
@@ -345,6 +348,18 @@ exports.uploadImageToTravelplan = asyncHandler(async (req, res, next) => {
     }
 
     await Travelplan.findByIdAndUpdate(req.params.planId, { image: file.name });
+
+    //Delete the old image
+    if (imageToBeDelete && imageToBeDelete !== "no-image.jpg") {
+      fs.unlink(
+        `${process.env.FILE_UPLOAD_PATH}/${imageToBeDelete}`,
+        (error) => {
+          if (error) {
+            console.log(error);
+          }
+        }
+      );
+    }
 
     res.status(200).json({
       success: true,
