@@ -8,6 +8,7 @@ const path = require('path');
 const travelgroup = require('./routes/travelgroupRoute');
 const travelplan = require('./routes/travelplanRoute');
 const errorHandler = require('./middleware/error');
+const fileupload = require('express-fileupload');
 
 // Load env variables
 dotenv.config({ path: `./config/config.env` });
@@ -25,6 +26,8 @@ if (process.env.NODE_ENV === 'development') {
     app.use(morgan('dev'));
 }
 
+//File uploading
+app.use(fileupload());
 
 //Enable Cors
 app.use(cors());
