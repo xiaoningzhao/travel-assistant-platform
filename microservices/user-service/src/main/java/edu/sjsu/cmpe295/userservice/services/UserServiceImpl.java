@@ -27,6 +27,7 @@ public class UserServiceImpl implements UserService{
     private final FriendRepository friendRepository;
     private final FavoritePlaceRepository favoritePlaceRepository;
     private final UserAvatarRepository userAvatarRepository;
+    private final NotificationService notificationService;
 
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
@@ -151,6 +152,11 @@ public class UserServiceImpl implements UserService{
             friend.setUser1Id(user1Id);
             friend.setUser2Id(user2Id);
             friend.setStatus("1");
+
+            User user1 = userRepository.findById(user1Id).get();
+            String user1Name = user1.getFirstName() +" "+ user1.getLastName();
+            notificationService.sendNotification(user2Id, "INFO", "Friend Added", user1Name+" added you as a friend.");
+
             return friendRepository.save(friend);
         }else{
             throw new NotFoundException("User does not exist.");
@@ -167,6 +173,11 @@ public class UserServiceImpl implements UserService{
             if(friendRepository.existsById(friendId)){
                 Friend friend = friendRepository.findById(friendId).get();
                 friendRepository.delete(friend);
+
+                User user1 = userRepository.findById(user1Id).get();
+                String user1Name = user1.getFirstName() +" "+ user1.getLastName();
+                notificationService.sendNotification(user2Id, "INFO", "Friend Removed", user1Name+" removed you from friend list.");
+
                 return friend;
             }else{
                 throw new NotFoundException("Friend relationship not exists.");

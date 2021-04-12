@@ -18,7 +18,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ResponseMessage handleException(Exception e){
-        return new ResponseMessage(LocalDateTime.now().toString(), HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getClass().getSimpleName(), e.getMessage());
+        return new ResponseMessage(LocalDateTime.now().toString(), HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getClass().getSimpleName(), getRealMessage(e));
     }
 
     @ExceptionHandler(ConflictException.class)
@@ -43,5 +43,16 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseMessage handleMethodArgumentNotValidException(Exception e){
         return new ResponseMessage(LocalDateTime.now().toString(), HttpStatus.BAD_REQUEST.value(), e.getClass().getSimpleName(), e.getMessage());
+    }
+
+    private String getRealMessage(Throwable e) {
+        while (e != null) {
+            Throwable cause = e.getCause();
+            if (cause == null) {
+                return e.getMessage();
+            }
+            e = cause;
+        }
+        return "";
     }
 }
